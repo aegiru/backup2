@@ -37,12 +37,12 @@ check_for_cancel_in_dialog() {
 }
 
 display=""
-address="143.47.181.131"
-username="ubuntu"
-password="uwu"
-keylocation="./shit.key"
-locallocation="./"
-remotelocation="~/backup/"
+address=""
+username=""
+password=""
+keylocation=""
+locallocation=""
+remotelocation=""
 
 download_and_decompress() {
     FOLDER_NAME_SCP="${FOLDER_NAME// /\\ }"
