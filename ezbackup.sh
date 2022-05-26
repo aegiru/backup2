@@ -1,17 +1,23 @@
 #!/bin/bash
 
 UNIQUE_SEPARATOR="😎"
+CONNECTION_LOCATION="./connections"
+
+leave() {
+    clear
+    exit 0
+}
 
 print_help() {
     printf "Usage: ./ezbackup.sh [OPTION]\nOptional arguments:\n  -h  Display this text.\n  -v  Output version information.\n"
 
-    exit 0
+    leave
 }
 
 print_version() {
     printf "EZBackUp version 1.048596\n"
 
-    exit 0
+    leave
 }
 
 while getopts "hv" option; do
@@ -62,7 +68,7 @@ list_folders() {
     if [ -z keylocation ] ; then
         FILELIST=$(sshpass -p "$password" ssh "$username@$address" "cd "$remotelocation" && find ./* -maxdepth 0 -type f -iname '*.tar.gz' -printf '%f$UNIQUE_SEPARATOR'")
     else
-        FILELIST=$(ssh -i "$keylocation" "$username@$address" "cd "$remotelocation" && find ./* -maxdepth 0 -type f -iname '*.*' -printf '%f$UNIQUE_SEPARATOR'")
+        FILELIST=$(ssh -i "$keylocation" "$username@$address" "cd "$remotelocation" && find ./* -maxdepth 0 -type f -iname '*.tar.gz' -printf '%f$UNIQUE_SEPARATOR'")
     fi
 
     install_unique_separator
@@ -101,6 +107,11 @@ compress_and_upload() {
     rm "./$DATE.tar.gz"
 }
 
+fix_connection_newline() {
+    display="${display//[$'\t\r\n']}"
+    address="${address//[$'\t\r\n']}"
+}
+
 connection_config() {
     VALUES=$(dialog --stdout --output-separator "$UNIQUE_SEPARATOR" --ok-label "Submit" \
     --form "Connection Settings" 13 60 0 \
@@ -114,7 +125,6 @@ connection_config() {
 
     check_for_cancel_in_dialog
 
-    
     install_unique_separator
     ARRAY_VALUES=($VALUES)
     reinstate_previous_separator
@@ -124,6 +134,56 @@ connection_config() {
     username=${ARRAY_VALUES[2]}
     password=${ARRAY_VALUES[3]}
     keylocation=${ARRAY_VALUES[4]}
+}
+
+connection_selector() {
+    pushd $CONNECTION_LOCATION
+    CONNECTIONS=$(find ./* -maxdepth 0 -type f -iname "*.connection" -printf "%f$UNIQUE_SEPARATOR")
+    popd
+
+    install_unique_separator
+    ARRAY_CONNECTIONS=($CONNECTIONS)
+    reinstate_previous_separator
+
+    CONNECTIONS_DIALOG="dialog --stdout --ok-label \"Submit\" --menu \"Choose the connection.\" 12 60 0 "
+
+    d=1
+
+    for i in "${ARRAY_CONNECTIONS[@]}"
+    do
+        . "$CONNECTION_LOCATION/$i"
+        fix_connection_newline
+        CONNECTIONS_DIALOG+="$d \"$display | $address\" "
+        (($d++))
+    done
+
+    CONNECTIONS_VALUE=$(eval $CONNECTIONS_DIALOG)
+
+    check_for_cancel_in_dialog
+}
+
+connection_menu() {
+    CONNECTION_MENU_DIALOG=$(dialog --stdout --ok-label "Submit" \
+    --menu "What would you like to do with your connections?" 12 60 0 \
+    1 "New Connection" \
+    2 "Edit Existing Connections" \
+    3 "Delete a Connection")
+
+    check_for_cancel_in_dialog
+}
+
+connection_config() {
+    connection_menu
+
+    if [ $CONNECTION_MENU_DIALOG -eq 1 ] ; then
+
+    elif [ $CONNECTION_MENU_DIALOG -eq 2] ; then
+
+    elif [ $CONNECTION_MENU_DIALOG -eq 3 ] ; then
+
+    else
+        main_menu
+    fi
 }
 
 upload_config() {
@@ -143,17 +203,20 @@ main_menu() {
     --menu "Back up or restore?" 12 60 0 \
     1 "Back Up" \
     2 "Restore" \
-    3 "Exit")
+    3 "Connection Editor" \
+    4 "Exit")
 
     check_for_cancel_in_dialog
 
 
     if [ $MENU_VALUES -eq 1 ] ; then
         upload_config
-    elif [ $MENU_VALUES -eq 3 ] ; then
-        exit 0
+    elif [ $MENU_VALUES -eq 4 ] ; then
+        leave
     elif [ $MENU_VALUES -eq 2 ] ; then
         download_config
+    elif [ $MENU_VALUES -eq 3 ] ; then
+        connection_selector
     else
         main_menu
     fi
