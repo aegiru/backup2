@@ -136,6 +136,12 @@ connection_config() {
     keylocation=${ARRAY_VALUES[4]}
 }
 
+
+
+new_connection() {
+
+}
+
 connection_selector() {
     pushd $CONNECTION_LOCATION
     CONNECTIONS=$(find ./* -maxdepth 0 -type f -iname "*.connection" -printf "%f$UNIQUE_SEPARATOR")
