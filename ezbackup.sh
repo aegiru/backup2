@@ -3,10 +3,14 @@
 UNIQUE_SEPARATOR="😎"
 CONNECTION_LOCATION="./connections"
 
+
+
 leave() {
     clear
     exit 0
 }
+
+
 
 print_help() {
     printf "Usage: ./ezbackup.sh [OPTION]\nOptional arguments:\n  -h  Display this text.\n  -v  Output version information.\n"
@@ -14,11 +18,15 @@ print_help() {
     leave
 }
 
+
+
 print_version() {
     printf "EZBackUp version 1.048596\n"
 
     leave
 }
+
+
 
 while getopts "hv" option; do
     case "$option" in
@@ -27,14 +35,20 @@ while getopts "hv" option; do
     esac
 done
 
+
+
 install_unique_separator() {
     TEMP_IFS=$IFS
     IFS=$UNIQUE_SEPARATOR
 }
 
+
+
 reinstate_previous_separator() {
     IFS=$TEMP_IFS
 }
+
+
 
 check_for_cancel_in_dialog() {
     if [ $? -eq 1 ] ; then
@@ -42,13 +56,19 @@ check_for_cancel_in_dialog() {
     fi
 }
 
-display=""
-address=""
-username=""
-password=""
-keylocation=""
-locallocation=""
-remotelocation=""
+
+
+reset_connection_variable() {
+    display=""
+    address=""
+    username=""
+    password=""
+    keylocation=""
+    locallocation=""
+    remotelocation=""
+}
+
+
 
 download_and_decompress() {
     FOLDER_NAME_SCP="${FOLDER_NAME// /\\ }"
@@ -63,6 +83,8 @@ download_and_decompress() {
 
     rm "./$FOLDER_NAME"
 }
+
+
 
 list_folders() {
     if [ -z keylocation ] ; then
@@ -94,6 +116,8 @@ list_folders() {
     download_and_decompress
 }
 
+
+
 compress_and_upload() {
     DATE=$(date '+%Y-%m-%d %H-%M-%S')
     tar -C "$locallocation" -czf "$DATE.tar.gz" $(ls "$locallocation")
@@ -107,10 +131,14 @@ compress_and_upload() {
     rm "./$DATE.tar.gz"
 }
 
+
+
 fix_connection_newline() {
     display="${display//[$'\t\r\n']}"
     address="${address//[$'\t\r\n']}"
 }
+
+
 
 connection_config() {
     VALUES=$(dialog --stdout --output-separator "$UNIQUE_SEPARATOR" --ok-label "Submit" \
@@ -138,11 +166,7 @@ connection_config() {
 
 
 
-new_connection() {
-
-}
-
-connection_selector() {
+load_connections() {
     pushd $CONNECTION_LOCATION
     CONNECTIONS=$(find ./* -maxdepth 0 -type f -iname "*.connection" -printf "%f$UNIQUE_SEPARATOR")
     popd
@@ -150,6 +174,27 @@ connection_selector() {
     install_unique_separator
     ARRAY_CONNECTIONS=($CONNECTIONS)
     reinstate_previous_separator
+}
+
+
+
+new_connection() {
+    reset_connection_variable
+
+    connection_config
+
+    o=0
+
+    for i in "${ARRAY_CONNECTIONS[@]}"
+    do
+        
+    done
+}
+
+
+
+connection_selector() {
+    load_connections
 
     CONNECTIONS_DIALOG="dialog --stdout --ok-label \"Submit\" --menu \"Choose the connection.\" 12 60 0 "
 
@@ -168,6 +213,8 @@ connection_selector() {
     check_for_cancel_in_dialog
 }
 
+
+
 connection_menu() {
     CONNECTION_MENU_DIALOG=$(dialog --stdout --ok-label "Submit" \
     --menu "What would you like to do with your connections?" 12 60 0 \
@@ -178,11 +225,13 @@ connection_menu() {
     check_for_cancel_in_dialog
 }
 
+
+
 connection_config() {
     connection_menu
 
     if [ $CONNECTION_MENU_DIALOG -eq 1 ] ; then
-
+        new_connection
     elif [ $CONNECTION_MENU_DIALOG -eq 2] ; then
 
     elif [ $CONNECTION_MENU_DIALOG -eq 3 ] ; then
@@ -192,11 +241,15 @@ connection_config() {
     fi
 }
 
+
+
 upload_config() {
     connection_config
 
     compress_and_upload
 }
+
+
 
 download_config() {
     connection_config
@@ -204,7 +257,11 @@ download_config() {
     list_folders
 }
 
+
+
 main_menu() {
+    reset_connection_variable
+
     MENU_VALUES=$(dialog --stdout --ok-label "Submit" \
     --menu "Back up or restore?" 12 60 0 \
     1 "Back Up" \
@@ -227,5 +284,7 @@ main_menu() {
         main_menu
     fi
 }
+
+
 
 main_menu
