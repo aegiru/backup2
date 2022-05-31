@@ -189,7 +189,7 @@ new_connection() {
 
     connection_config
 
-    
+    filename_selector
 }
 
 
