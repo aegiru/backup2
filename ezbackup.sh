@@ -178,17 +178,18 @@ load_connections() {
 
 
 
+filename_selector() {
+    FILENAME_DIALOG="dialog --stdout --ok-label \"Submit\" --inputbox \"Choose a filename to save your connection to.\" 12 60 0"
+}
+
+
+
 new_connection() {
     reset_connection_variable
 
     connection_config
 
-    o=0
-
-    for i in "${ARRAY_CONNECTIONS[@]}"
-    do
-        
-    done
+    
 }
 
 
