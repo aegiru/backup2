@@ -63,7 +63,7 @@ reset_connection_variable() {
     address=""
     username=""
     password=""
-    keylocation=""
+    keyname=""
     locallocation=""
     remotelocation=""
 }
@@ -73,10 +73,10 @@ reset_connection_variable() {
 download_and_decompress() {
     FOLDER_NAME_SCP="${FOLDER_NAME// /\\ }"
 
-    if [ -z keylocation ] ; then
+    if [ -z keyname ] ; then
         sshpass -p "$password" scp "$username@$address:$remotelocation/$FOLDER_NAME_SCP" "./"
     else
-        scp -i "$keylocation" "$username@$address:$remotelocation/$FOLDER_NAME_SCP" "./"
+        scp -i "$keyname" "$username@$address:$remotelocation/$FOLDER_NAME_SCP" "./"
     fi
 
     tar --overwrite -C "$locallocation" -xf  "./$FOLDER_NAME" 
@@ -87,10 +87,10 @@ download_and_decompress() {
 
 
 list_folders() {
-    if [ -z keylocation ] ; then
+    if [ -z keyname ] ; then
         FILELIST=$(sshpass -p "$password" ssh "$username@$address" "cd "$remotelocation" && find ./* -maxdepth 0 -type f -iname '*.tar.gz' -printf '%f$UNIQUE_SEPARATOR'")
     else
-        FILELIST=$(ssh -i "$keylocation" "$username@$address" "cd "$remotelocation" && find ./* -maxdepth 0 -type f -iname '*.tar.gz' -printf '%f$UNIQUE_SEPARATOR'")
+        FILELIST=$(ssh -i "$keyname" "$username@$address" "cd "$remotelocation" && find ./* -maxdepth 0 -type f -iname '*.tar.gz' -printf '%f$UNIQUE_SEPARATOR'")
     fi
 
     install_unique_separator
@@ -122,10 +122,10 @@ compress_and_upload() {
     DATE=$(date '+%Y-%m-%d %H-%M-%S')
     tar -C "$locallocation" -czf "$DATE.tar.gz" $(ls "$locallocation")
     
-    if [ -z keylocation ] ; then
+    if [ -z keyname ] ; then
         sshpass -p "$password" scp "./$DATE.tar.gz" "$username@$address:$remotelocation"
     else
-        scp -i "$keylocation" "./$DATE.tar.gz" "$username@$address:$remotelocation"
+        scp -i "$keyname" "./$DATE.tar.gz" "$username@$address:$remotelocation"
     fi
 
     rm "./$DATE.tar.gz"
@@ -147,7 +147,7 @@ connection_config() {
     "Address" 2 1 "$address" 2 15 40 0 \
     "Username" 3 1 "$username" 3 15 40 0 \
     "Password" 4 1 "$password" 4 15 40 0 \
-    "Key Location" 5 1 "$keylocation" 5 15 40 0 \
+    "Key Location" 5 1 "$keyname" 5 15 40 0 \
     "Local Location" 6 1 "$locallocation" 6 15 40 0 \
     "Remote Location" 7 1 "$remotelocation" 7 15 40 0)
 
@@ -161,7 +161,7 @@ connection_config() {
     address=${ARRAY_VALUES[1]}
     username=${ARRAY_VALUES[2]}
     password=${ARRAY_VALUES[3]}
-    keylocation=${ARRAY_VALUES[4]}
+    keyname=${ARRAY_VALUES[4]}
 }
 
 
@@ -190,6 +190,16 @@ new_connection() {
     connection_config
 
     filename_selector
+
+    TEXT_TO_SAVE="display=\"$display\"
+    address=\"$address\"
+    username=\"$username\"
+    password=\"$password\"
+    keyname=\"$keyname\"
+    locallocation=\"$locallocation\"
+    remotelocation=\"$remotelocation\""
+
+    echo "$TEXT_TO_SAVE"
 }
 
 
