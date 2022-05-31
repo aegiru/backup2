@@ -199,7 +199,9 @@ new_connection() {
     locallocation=\"$locallocation\"
     remotelocation=\"$remotelocation\""
 
-    echo "$TEXT_TO_SAVE"
+    echo "$TEXT_TO_SAVE" > "$CONNECTION_LOCATION/$FILENAME_DIALOG"
+
+    reset_connection_variable
 }
 
 
