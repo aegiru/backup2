@@ -1,0 +1,19 @@
+.TH man 1 "06.01.2022" "1.0" "ezbackup man page"
+.SH NAME
+.B EZBackup
+.SH SYNOPSIS
+.PP
+A script for backing up and restoring files on remote servers using SSH.
+.SH DESCRIPTION
+See SYNOPSIS.
+.SH OPTIONS
+.IP \-v
+Display the version of the software.
+.IP \-h
+Display help regarding the software.
+.SH AUTHOR
+Jakub Jedrzejczyk, 188752, Informatyka grupa 2.
+.SH BUGS
+The software almost always expects correct input. Supplying it with incorrect addresses, passwords, key locations, etc\. may result in unexpected and / or undocumented behavior.
+.SH SEE ALSO
+\fBssh\fP(1), \fBscp\fP(1), \fBfind\fP(1), \fBtest\fP(1), \fBdialog\fP(1), \fBsshpass\fP(1), \fBtar\fP(1), \fBdate\fP(1)
