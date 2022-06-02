@@ -6,6 +6,14 @@ KEY_LOCATION="./keys"
 
 
 
+check_keys_folder() {
+    if [ ! -d "$CONNECTION_LOCATION" ] ; then
+        
+    fi
+}
+
+
+
 leave() {
     clear
     exit 0
@@ -28,14 +36,14 @@ print_version() {
 }
 
 
-
-while getopts "hv" option; do
-    case "$option" in
-        'h') print_help ;;
-        'v') print_version ;;
-    esac
-done
-
+options() {
+    while getopts "hv" option; do
+        case "$option" in
+            'h') print_help ;;
+            'v') print_version ;;
+        esac
+    done
+}
 
 
 install_unique_separator() {
