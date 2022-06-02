@@ -6,12 +6,17 @@ KEY_LOCATION="./keys"
 
 
 
-check_keys_folder() {
+check_connection_folder() {
     if [ ! -d "$CONNECTION_LOCATION" ] ; then
         mkdir "$CONNECTION_LOCATION"
     fi
 }
 
+check_keys_folder() {
+    if [ ! -d "$KEY_LOCATION" ] ; then
+        mkdir "$KEY_LOCATION"
+    fi
+}
 
 
 leave() {
