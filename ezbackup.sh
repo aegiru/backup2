@@ -8,7 +8,7 @@ KEY_LOCATION="./keys"
 
 check_keys_folder() {
     if [ ! -d "$CONNECTION_LOCATION" ] ; then
-        
+        mkdir "$CONNECTION_LOCATION"
     fi
 }
 
